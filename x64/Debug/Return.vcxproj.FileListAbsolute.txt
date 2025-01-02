@@ -1,0 +1,2 @@
+C:\Users\martin\source\repos\Return\x64\Debug\Return.exe
+C:\Users\martin\source\repos\Return\x64\Debug\Return.pdb
