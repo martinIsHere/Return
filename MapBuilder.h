@@ -3,9 +3,7 @@
 // TODO: make map editor in console
 
 class MapBuilder {
-	
-	char* _arrayOfCells;
+  char* _arrayOfCells;
 
-public:
-
+ public:
 };
