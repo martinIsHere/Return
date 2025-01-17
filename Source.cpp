@@ -5,6 +5,8 @@
 #include "Scribbler.h"
 
 // TODO : add text functionality in corner
+// TODO : add window resize event -> check if new window buffer is bigger
+//        -> recreate the currently used window buffer.
 
 int main() {
   // drawing object
@@ -49,6 +51,7 @@ int main() {
     if (GetAsyncKeyState(VK_ESCAPE) >> 15) programOngoing = false;
 
     // movement keys
+    // TODO - CLEAN DISHIT UP
     if (GetAsyncKeyState(VK_RIGHT) >> 15) {
       playerPos.y += 0.2f * (-arrayOfRays[indexToForwardDirVector].x);
       playerPos.x += 0.2f * (arrayOfRays[indexToForwardDirVector].y);
@@ -76,14 +79,23 @@ int main() {
 
     // debug key
     if (GetAsyncKeyState('K') >> 15) {
-      error_number(distances[1]);
+      // error_number(distances[1]);
+      std::string sampleMessage = "Hello          ";
+      s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
     }
 
     // correct boundary crossing
-    if (playerPos.x < 0) playerPos.x = 0;
-    if (playerPos.y < 0) playerPos.y = 0;
-    if (playerPos.x > SCREEN_WIDTH - 1) playerPos.x = SCREEN_WIDTH - 1;
-    if (playerPos.y > SCREEN_HEIGHT - 1) playerPos.y = SCREEN_HEIGHT - 1;
+    if (playerPos.x < 0)
+      playerPos.x = 0;
+
+    else if (playerPos.x > SCREEN_WIDTH - 1)
+      playerPos.x = SCREEN_WIDTH - 1;
+
+    if (playerPos.y < 0)
+      playerPos.y = 0;
+
+    else if (playerPos.y > SCREEN_HEIGHT - 1)
+      playerPos.y = SCREEN_HEIGHT - 1;
 
     // clear
     s->drawRectangle_color(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT * 0.5,

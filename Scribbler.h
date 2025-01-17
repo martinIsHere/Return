@@ -60,6 +60,22 @@ class Scribbler {
       }
     }
   }
+  // using the character and color information of each character in console
+  // write inputted text at given coordinate
+  // does not change color attributes
+  void writeText(uint32_t x, uint32_t y, size_t stringLen,
+                 std::string message) {
+    // assert boundaries
+    if (x >= (uint32_t)_coordBufSize.X || y >= (uint32_t)_coordBufSize.Y) {
+      return;
+    }
+    // assign attribute values to relevant cells
+    for (uint32_t i = 0; i < stringLen && x + i < (uint32_t)_coordBufSize.X;
+         i++) {
+      _chiBuffer[(x + _coordBufSize.X * y) + i].Char.UnicodeChar =
+          (WCHAR)message.at((size_t)i);
+    }
+  }
 
   // write to console using character_info array buffer
   void drawToConsole() {
@@ -97,15 +113,14 @@ class Scribbler {
     if (GetConsoleMode(_windowHandle, &_consoleMode_data)) exit(1);
 
     // set console mode. Hinders character input
-    SetConsoleMode(
-        _windowHandle,
-        (ENABLE_EXTENDED_FLAGS | _consoleMode_data & ~ENABLE_MOUSE_INPUT &
-                                     ~ENABLE_INSERT_MODE & ~ENABLE_LINE_INPUT));
+    SetConsoleMode(_windowHandle, (ENABLE_EXTENDED_FLAGS |
+                                   (_consoleMode_data & ~ENABLE_MOUSE_INPUT &
+                                    ~ENABLE_INSERT_MODE & ~ENABLE_LINE_INPUT)));
 
     // stores the console's current dimensions
     GetWindowRect(_windowHandle, &_r);
 
-    // changes the console's dimensions. dimensions perfectly fit all
+    // changes the console's dimensions. dimensions perfectly (kind of) fit all
     // charcacters
     MoveWindow(_windowHandle, _r.left, _r.top, SCREEN_WIDTH_PIXELS,
                SCREEN_HEIGHT_PIXELS, TRUE);
