@@ -107,9 +107,6 @@ int main() {
     s->drawRectangle_color((uint32_t)playerPos.x, (uint32_t)playerPos.y, 1, 1,
                            Scribbler::color::RED);
 
-    // forward screen buffer
-    s->drawToConsole();
-
     // debug key
     if (GetAsyncKeyState('K') >> 15 || 1) {
       // error_number(distances[1]);
@@ -118,6 +115,9 @@ int main() {
       sampleMessage = std::to_string(s->getScreenWidth());
       s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
     }
+
+    // forward screen buffer
+    s->drawToConsole();
 
     // 100 ms delay
     Sleep(100);
