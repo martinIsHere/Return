@@ -60,6 +60,25 @@ class Scribbler {
       }
     }
   }
+  // using the color attribute of characters in console, draw rectangle
+  void drawRectangle_colorAndChar(uint32_t x, uint32_t y, uint32_t width,
+                                  uint32_t height, color c, WCHAR a) {
+    // assert boundaries
+    if (x >= (uint32_t)_coordBufSize.X || y >= (uint32_t)_coordBufSize.Y) {
+      return;
+    }
+    // assign attribute values to relevant cells
+    for (uint32_t i = 0; i < height && y + i < (uint32_t)_coordBufSize.Y; i++) {
+      for (uint32_t j = 0; j < width && x + j < (uint32_t)_coordBufSize.X;
+           j++) {
+        _chiBuffer[(x + _coordBufSize.X * y) + (j + (i)*_coordBufSize.X)]
+            .Attributes = (WORD)c;
+        _chiBuffer[(x + _coordBufSize.X * y) + (j + (i)*_coordBufSize.X)]
+            .Char.UnicodeChar = a;
+      }
+    }
+  }
+
   // using the character and color information of each character in console
   // write inputted text at given coordinate
   // does not change color attributes
@@ -76,9 +95,45 @@ class Scribbler {
           (WCHAR)message.at((size_t)i);
     }
   }
+  // ----------------------- temporary --------------------------------
+  size_t getScreenWidth() { return _srctWriteRect.Right; }
+  // ----------------------- temporary --------------------------------
 
+  void clearScreen() {
+    // temp bool
+    bool a = true;
+    for (CHAR_INFO& c : _chiBuffer) {
+      if (a) {
+        c.Char.UnicodeChar = L':';
+        a = false;
+      } else {
+        c.Char.UnicodeChar = L'*';
+        a = true;
+      }
+
+      // black background, white text
+      c.Attributes = 0x0F;
+    }
+  }
   // write to console using character_info array buffer
   void drawToConsole() {
+    // QUICK-FIX
+    // The temporary buffer size
+    _coordBufSize.Y = SCREEN_HEIGHT;
+    _coordBufSize.X = SCREEN_WIDTH;
+
+    // coordinate in conosle
+    _coordBufCoord.X = 0;
+    _coordBufCoord.Y = 0;
+
+    // coordinates in conosle describing rectangle in console
+    _srctWriteRect.Top = 0;
+    _srctWriteRect.Left = 0;
+    _srctWriteRect.Bottom = SCREEN_HEIGHT - 1;
+    _srctWriteRect.Right = SCREEN_WIDTH - 1;
+
+    // QUICK-FIX END
+
     _fSuccess =
         WriteConsoleOutput(_hScreenBuffer,  // screen buffer to write to
                            _chiBuffer,      // buffer to copy from
@@ -140,7 +195,7 @@ class Scribbler {
     bool a = true;
 
     // loop through character_info array buffer / screen buffer and set every
-    // character to '/' or '\' with black background and white text
+    // character to ':' or '*' with black background and white text
     for (CHAR_INFO& c : _chiBuffer) {
       if (a) {
         c.Char.UnicodeChar = L':';
@@ -169,12 +224,6 @@ class Scribbler {
     _srctWriteRect.Right = SCREEN_WIDTH - 1;
 
     // Copy from the temporary buffer to the new screen buffer.
-    _fSuccess =
-        WriteConsoleOutput(_hScreenBuffer,  // screen buffer to write to
-                           _chiBuffer,      // buffer to copy from
-                           _coordBufSize,   // col-row size of chiBuffer
-                           _coordBufCoord,  // top left src cell in chiBuffer
-                           &_srctWriteRect  // dest. screen buffer rectangle
-        );
+    drawToConsole();
   }
 };

@@ -16,8 +16,8 @@
 // important constants
 // WIDTH 155
 // HEIGHT 42
-#define SCREEN_WIDTH 155
-#define SCREEN_HEIGHT 42
+#define SCREEN_WIDTH 300
+#define SCREEN_HEIGHT 100
 #define SCREEN_WIDTH_PIXELS 1280
 #define SCREEN_HEIGHT_PIXELS 720
 #define PI 3.14159f

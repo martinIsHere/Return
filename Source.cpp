@@ -7,6 +7,8 @@
 // TODO : add text functionality in corner
 // TODO : add window resize event -> check if new window buffer is bigger
 //        -> recreate the currently used window buffer.
+// TODO : draw farther objects/walls in darker shade.
+// TODO : mapbuilder (HIGH-PRIORITY)
 
 int main() {
   // drawing object
@@ -77,13 +79,6 @@ int main() {
       generateRayArray(arrayOfRays, amountOfRays, cameraAngle);
     }
 
-    // debug key
-    if (GetAsyncKeyState('K') >> 15) {
-      // error_number(distances[1]);
-      std::string sampleMessage = "Hello          ";
-      s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
-    }
-
     // correct boundary crossing
     if (playerPos.x < 0)
       playerPos.x = 0;
@@ -98,6 +93,8 @@ int main() {
       playerPos.y = SCREEN_HEIGHT - 1;
 
     // clear
+    s->clearScreen();
+
     s->drawRectangle_color(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT * 0.5,
                            Scribbler::color::BLUE);
     s->drawRectangle_color(0, SCREEN_HEIGHT * 0.5, SCREEN_WIDTH,
@@ -112,6 +109,15 @@ int main() {
 
     // forward screen buffer
     s->drawToConsole();
+
+    // debug key
+    if (GetAsyncKeyState('K') >> 15 || 1) {
+      // error_number(distances[1]);
+      std::string sampleMessage = "                ";
+      s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
+      sampleMessage = std::to_string(s->getScreenWidth());
+      s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
+    }
 
     // 100 ms delay
     Sleep(100);

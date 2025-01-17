@@ -125,7 +125,7 @@ void generateRayArray(
   float startRay_y = buffer_startRay_x * yHat.x + buffer_startRay_y * yHat.y;
 
   // distance between endpoints of rays
-  float xIncrement = 8.0f / ((float)amount - 1);
+  float xIncrement = 6.0f / ((float)amount - 1);
 
   // 69 funny hehe xd
   Vec2 buffer{69, 69};
@@ -189,10 +189,10 @@ void draw3DRenderColumns(
                 uint32_t(float(SCREEN_HEIGHT) / distances[i] * 0.5f);
 
       // draw column based on distances
-      s->drawRectangle_color(remainderColWidth + (i - 1) * colWidth, offsetY,
-                             remainderColWidth,
-                             uint32_t(SCREEN_HEIGHT / distances[i]),
-                             Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT);
+      s->drawRectangle_colorAndChar(
+          remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
+          uint32_t(SCREEN_HEIGHT / distances[i]),
+          Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT, L'#');
     }
   }
 }
