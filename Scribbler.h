@@ -41,6 +41,7 @@ class Scribbler {
     BLUE = BACKGROUND_BLUE,
     WHITE_TEXT = 0x0F,
     WHITE_BACKGROUND_BLACK_TEXT = 0xF0,
+    GRAY_BACKGROUND_BLACK_TEXT = 0x70,
     BLACK = 0x00
   };
 

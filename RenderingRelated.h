@@ -189,10 +189,22 @@ void draw3DRenderColumns(
                 uint32_t(float(SCREEN_HEIGHT) / distances[i] * 0.5f);
 
       // draw column based on distances
-      s->drawRectangle_colorAndChar(
-          remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
-          uint32_t(SCREEN_HEIGHT / distances[i]),
-          Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT, L'#');
+      if (distances[i] < 5) {
+        s->drawRectangle_colorAndChar(
+            remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
+            uint32_t(SCREEN_HEIGHT / distances[i]),
+            Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT, L'.');
+      } else if (distances[i] < 10) {
+        s->drawRectangle_colorAndChar(
+            remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
+            uint32_t(SCREEN_HEIGHT / distances[i]),
+            Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT, L'+');
+      } else {
+        s->drawRectangle_colorAndChar(
+            remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
+            uint32_t(SCREEN_HEIGHT / distances[i]),
+            Scribbler::color::GRAY_BACKGROUND_BLACK_TEXT, L'#');
+      }
     }
   }
 }

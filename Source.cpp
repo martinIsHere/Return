@@ -10,7 +10,11 @@
 // TODO : draw farther objects/walls in darker shade.
 // TODO : mapbuilder (HIGH-PRIORITY)
 
-int main() {
+int main(int argc, char** argv) {
+  // TODO : add commandline bool argument to change size of screen
+  // if(argc == 1)
+  // if(*argv[0])
+
   // drawing object
   Scribbler* s = new Scribbler();
 
@@ -120,7 +124,7 @@ int main() {
     s->drawToConsole();
 
     // 100 ms delay
-    Sleep(100);
+    Sleep(50);
   }
   free(arrayOfRays);
 
