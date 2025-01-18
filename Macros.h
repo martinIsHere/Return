@@ -21,6 +21,7 @@
 #define SCREEN_WIDTH_PIXELS 1280
 #define SCREEN_HEIGHT_PIXELS 720
 #define PI 3.14159f
+#define ACTIVE_WALLS 32
 
 // character width = 792/94 ish equal to 8.4255319148936170212765957446809
 // character height = 790/46 ish equal to 17.173913043478260869565217391304

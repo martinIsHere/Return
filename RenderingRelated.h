@@ -39,7 +39,7 @@ float evaluateDistanceBetweenRayAndWall(const LineSegment& v,  // Casted Ray
   if (r < 0 || r > 1) {
     return -1;
   }
-  if (t < 0) {
+  if (t <= 0) {
     return -1;
   }
 
@@ -189,6 +189,7 @@ void draw3DRenderColumns(
                 uint32_t(float(SCREEN_HEIGHT) / distances[i] * 0.5f);
 
       // draw column based on distances
+      // kinda janky code
       if (distances[i] < 5) {
         s->drawRectangle_colorAndChar(
             remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,

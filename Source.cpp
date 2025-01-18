@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "Macros.h"
 #include "RenderingRelated.h"
@@ -39,14 +40,18 @@ int main(int argc, char** argv) {
 
   // array of visible walls
   size_t amountOfActiveWalls = 5;
-  Wall activeWalls[5] = {
-      Wall{Vec2{10, -1}, Vec2{0, 10}},
-      Wall{Vec2{-1, -1}, Vec2{SCREEN_WIDTH + 1, 0}},
-      Wall{Vec2{-1, -1}, Vec2{0, SCREEN_HEIGHT + 1}},
-      Wall{Vec2{SCREEN_WIDTH, -1}, Vec2{0, SCREEN_HEIGHT + 1}},
-      Wall{Vec2{-1, SCREEN_HEIGHT}, Vec2{SCREEN_WIDTH + 1, 0}}};
+  Wall activeWalls[ACTIVE_WALLS] = {
+      Wall{Point{10, -1}, Vec2{0, 10}},
+      Wall{Point{-1, -1}, Vec2{SCREEN_WIDTH + 1, 0}},
+      Wall{Point{-1, -1}, Vec2{0, SCREEN_HEIGHT + 1}},
+      Wall{Point{SCREEN_WIDTH, -1}, Vec2{0, SCREEN_HEIGHT + 1}},
+      Wall{Point{-1, SCREEN_HEIGHT}, Vec2{SCREEN_WIDTH + 1, 0}}};
 
   bool programOngoing = true;
+
+  // Wall buffer
+  Wall wallBuffer{};
+  bool K_isPressed = false;
 
   while (programOngoing) {
     // update distances from walls
@@ -75,11 +80,11 @@ int main(int argc, char** argv) {
       playerPos.x -= 0.2f * arrayOfRays[indexToForwardDirVector].x;
     }
     if (GetAsyncKeyState('A') >> 15) {
-      cameraAngle += 0.1f;
+      cameraAngle += 0.2f;
       generateRayArray(arrayOfRays, amountOfRays, cameraAngle);
     }
     if (GetAsyncKeyState('D') >> 15) {
-      cameraAngle -= 0.1f;
+      cameraAngle -= 0.2f;
       generateRayArray(arrayOfRays, amountOfRays, cameraAngle);
     }
 
@@ -110,15 +115,34 @@ int main(int argc, char** argv) {
     // vectors
     s->drawRectangle_color((uint32_t)playerPos.x, (uint32_t)playerPos.y, 1, 1,
                            Scribbler::color::RED);
-
+    std::string sampleMessage;
     // debug key
-    if (GetAsyncKeyState('K') >> 15 || 1) {
+    if (GetAsyncKeyState('K') >> 15) {
+      if (K_isPressed) break;
+      K_isPressed = true;
       // error_number(distances[1]);
-      std::string sampleMessage = "                ";
+      static bool a = true;
+      sampleMessage = "                      ";
       s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
       sampleMessage = std::to_string(s->getScreenWidth());
       s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
+      if (a) {
+        wallBuffer.point = playerPos;
+        a = false;
+      } else {
+        wallBuffer.vec = playerPos - wallBuffer.point;
+        a = true;
+        activeWalls[amountOfActiveWalls] = wallBuffer;
+        amountOfActiveWalls++;
+        error_number(amountOfActiveWalls);
+      }
+    } else {
+      K_isPressed = false;
     }
+
+    sampleMessage =
+        std::to_string(playerPos.x) + ", " + std::to_string(playerPos.y);
+    s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
 
     // forward screen buffer
     s->drawToConsole();
