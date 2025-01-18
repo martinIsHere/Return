@@ -51,6 +51,10 @@ bool chainIsOngoing;
 
 void handleInput();
 
+void assertBoundaries_player();
+
+void clearConsoleScreen();
+
 int main(int argc, char** argv) {
   // TODO : add commandline bool argument to change size of screen
   // if(argc == 1)
@@ -105,33 +109,17 @@ int main(int argc, char** argv) {
 
     handleInput();
 
-    // correct boundary crossing
-    if (playerPos.x < 0)
-      playerPos.x = 0;
-    else if (playerPos.x > SCREEN_WIDTH - 1)
-      playerPos.x = SCREEN_WIDTH - 1;
+    assertBoundaries_player();
 
-    if (playerPos.y < 0)
-      playerPos.y = 0;
-    else if (playerPos.y > SCREEN_HEIGHT - 1)
-      playerPos.y = SCREEN_HEIGHT - 1;
-
-    // clear
-    scribblerInstance->clearScreen();
-
-    scribblerInstance->drawRectangle_color(
-        0, 0, SCREEN_WIDTH, SCREEN_HEIGHT * 0.5, Scribbler::color::BLUE);
-    scribblerInstance->drawRectangle_color(0, SCREEN_HEIGHT * 0.5, SCREEN_WIDTH,
-                                           SCREEN_HEIGHT * 0.5 + 1,
-                                           Scribbler::color::BLACK);
+    clearConsoleScreen();
 
     // 2.5d
     draw3DRenderColumns(scribblerInstance, distances, amountOfRays);
 
     // vectors
-    scribblerInstance->drawRectangle_color((uint32_t)playerPos.x,
-                                           (uint32_t)playerPos.y, 1, 1,
-                                           Scribbler::color::RED);
+    scribblerInstance->drawRectangle_color(
+        (uint32_t)playerPos.x, SCREEN_HEIGHT - 1 - (uint32_t)playerPos.y, 1, 1,
+        Scribbler::color::RED);
 
     sampleMessage =
         std::to_string(playerPos.x) + ", " + std::to_string(playerPos.y);
@@ -140,8 +128,8 @@ int main(int argc, char** argv) {
     // forward screen buffer
     scribblerInstance->drawToConsole();
 
-    // 100 ms delay
-    Sleep(50);
+    // 8 ms delay
+    Sleep(8);
   }
   free(arrayOfRays);
 
@@ -155,27 +143,27 @@ void handleInput() {
   // movement keys
   // TODO - CLEAN DISHIT UP
   if (GetAsyncKeyState(VK_RIGHT) >> 15) {
-    playerPos.y += 0.2f * (-arrayOfRays[indexToForwardDirVector].x);
-    playerPos.x += 0.2f * (arrayOfRays[indexToForwardDirVector].y);
+    playerPos.y += 0.05f * (-arrayOfRays[indexToForwardDirVector].x);
+    playerPos.x += 0.05f * (arrayOfRays[indexToForwardDirVector].y);
   }
   if (GetAsyncKeyState(VK_LEFT) >> 15) {
-    playerPos.y -= 0.2f * (-arrayOfRays[indexToForwardDirVector].x);
-    playerPos.x -= 0.2f * (arrayOfRays[indexToForwardDirVector].y);
+    playerPos.y -= 0.05f * (-arrayOfRays[indexToForwardDirVector].x);
+    playerPos.x -= 0.05f * (arrayOfRays[indexToForwardDirVector].y);
   }
   if (GetAsyncKeyState(VK_UP) >> 15) {
-    playerPos.y += 0.2f * arrayOfRays[indexToForwardDirVector].y;
-    playerPos.x += 0.2f * arrayOfRays[indexToForwardDirVector].x;
+    playerPos.y += 0.05f * arrayOfRays[indexToForwardDirVector].y;
+    playerPos.x += 0.05f * arrayOfRays[indexToForwardDirVector].x;
   }
   if (GetAsyncKeyState(VK_DOWN) >> 15) {
-    playerPos.y -= 0.2f * arrayOfRays[indexToForwardDirVector].y;
-    playerPos.x -= 0.2f * arrayOfRays[indexToForwardDirVector].x;
+    playerPos.y -= 0.05f * arrayOfRays[indexToForwardDirVector].y;
+    playerPos.x -= 0.05f * arrayOfRays[indexToForwardDirVector].x;
   }
   if (GetAsyncKeyState('A') >> 15) {
-    cameraAngle += 0.2f;
+    cameraAngle += 0.1f;
     generateRayArray(arrayOfRays, amountOfRays, cameraAngle);
   }
   if (GetAsyncKeyState('D') >> 15) {
-    cameraAngle -= 0.2f;
+    cameraAngle -= 0.1f;
     generateRayArray(arrayOfRays, amountOfRays, cameraAngle);
   }
 
@@ -209,4 +197,28 @@ void handleInput() {
     chainIsOngoing = false;
     wallBuffer = {Point{-1, -1}, Vec2{-1, -1}};
   }
+}
+
+void assertBoundaries_player() {
+  // correct boundary crossing
+  if (playerPos.x < 0)
+    playerPos.x = 0;
+  else if (playerPos.x > SCREEN_WIDTH - 1)
+    playerPos.x = SCREEN_WIDTH - 1;
+
+  if (playerPos.y < 0)
+    playerPos.y = 0;
+  else if (playerPos.y > SCREEN_HEIGHT - 1)
+    playerPos.y = SCREEN_HEIGHT - 1;
+}
+
+void clearConsoleScreen() {
+  // clear
+  scribblerInstance->clearScreen();
+
+  scribblerInstance->drawRectangle_color(
+      0, 0, SCREEN_WIDTH, SCREEN_HEIGHT * 0.5, Scribbler::color::BLUE);
+  scribblerInstance->drawRectangle_color(0, SCREEN_HEIGHT * 0.5, SCREEN_WIDTH,
+                                         SCREEN_HEIGHT * 0.5 + 1,
+                                         Scribbler::color::BLACK);
 }
