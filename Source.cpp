@@ -22,6 +22,7 @@ Point playerPos;
 // rays shooting from player position
 Vec2* arrayOfRays;
 size_t amountOfRays;
+Scribbler::color* rayColors;
 
 // array of distances from walls, SCREEN_WIDTH
 float* distances;
@@ -36,6 +37,7 @@ float cameraAngle;
 // array of visible walls
 size_t amountOfActiveWalls;
 Wall* activeWalls;
+Scribbler::color* wallColors;
 
 // Wall buffer
 Wall wallBuffer;
@@ -49,17 +51,37 @@ bool programOngoing;
 std::string sampleMessage;
 bool chainIsOngoing;
 
+// function declarations
+
+void initStaticVariables();
+
 void handleInput();
+
+void mainGameLoop();
 
 void assertBoundaries_player();
 
 void clearConsoleScreen();
+
+// function definitions
 
 int main(int argc, char** argv) {
   // TODO : add commandline bool argument to change size of screen
   // if(argc == 1)
   // if(*argv[0])
 
+  initStaticVariables();
+
+  while (programOngoing) {
+    mainGameLoop();
+  }
+  free(arrayOfRays);
+  free(activeWalls);
+
+  return 0;
+}
+
+void initStaticVariables() {
   // drawing object
   scribblerInstance = new Scribbler();
 
@@ -69,6 +91,7 @@ int main(int argc, char** argv) {
   // rays shooting from player position
   arrayOfRays = nullptr;
   amountOfRays = SCREEN_WIDTH;
+  rayColors = new Scribbler::color[SCREEN_WIDTH];
 
   // array of distances from walls
   distances = new float[SCREEN_WIDTH];
@@ -92,6 +115,14 @@ int main(int argc, char** argv) {
       Wall{Point{-1, -1}, Vec2{0, SCREEN_HEIGHT + 1}},
       Wall{Point{SCREEN_WIDTH, -1}, Vec2{0, SCREEN_HEIGHT + 1}},
       Wall{Point{-1, SCREEN_HEIGHT}, Vec2{SCREEN_WIDTH + 1, 0}}};
+  wallColors = new Scribbler::color[ACTIVE_WALLS]{
+      Scribbler::color::GREEN,
+      Scribbler::color::BLUE,
+      Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT,
+      Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT,
+      Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT,
+      Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT,
+  };
 
   programOngoing = true;
 
@@ -101,39 +132,6 @@ int main(int argc, char** argv) {
 
   // IMMENSELY JANKY
   chainIsOngoing = false;
-
-  while (programOngoing) {
-    // update distances from walls
-    updateDistances(distances, playerPos, arrayOfRays, amountOfRays,
-                    activeWalls, amountOfActiveWalls);
-
-    handleInput();
-
-    assertBoundaries_player();
-
-    clearConsoleScreen();
-
-    // 2.5d
-    draw3DRenderColumns(scribblerInstance, distances, amountOfRays);
-
-    // vectors
-    scribblerInstance->drawRectangle_color(
-        (uint32_t)playerPos.x, SCREEN_HEIGHT - 1 - (uint32_t)playerPos.y, 1, 1,
-        Scribbler::color::RED);
-
-    sampleMessage =
-        std::to_string(playerPos.x) + ", " + std::to_string(playerPos.y);
-    scribblerInstance->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
-
-    // forward screen buffer
-    scribblerInstance->drawToConsole();
-
-    // 8 ms delay
-    Sleep(8);
-  }
-  free(arrayOfRays);
-
-  return 0;
 }
 
 void handleInput() {
@@ -186,6 +184,7 @@ void handleInput() {
 
         wallBuffer.vec = playerPos - wallBuffer.point;
         activeWalls[amountOfActiveWalls] = wallBuffer;
+        wallColors[amountOfActiveWalls] = Scribbler::color::RED;
         amountOfActiveWalls++;
       }
     }
@@ -197,6 +196,37 @@ void handleInput() {
     chainIsOngoing = false;
     wallBuffer = {Point{-1, -1}, Vec2{-1, -1}};
   }
+}
+
+void mainGameLoop() {
+  // update distances from walls
+  updateDistances(distances, playerPos, arrayOfRays, rayColors, amountOfRays,
+                  activeWalls, wallColors, amountOfActiveWalls);
+
+  handleInput();
+
+  assertBoundaries_player();
+
+  clearConsoleScreen();
+
+  // 2.5d
+  draw3DRenderColumns_withColor(scribblerInstance, distances, amountOfRays,
+                                rayColors);
+
+  // vectors
+  scribblerInstance->drawRectangle_color(
+      (uint32_t)playerPos.x, SCREEN_HEIGHT - 1 - (uint32_t)playerPos.y, 1, 1,
+      Scribbler::color::RED);
+
+  sampleMessage =
+      std::to_string(playerPos.x) + ", " + std::to_string(playerPos.y);
+  scribblerInstance->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
+
+  // forward screen buffer
+  scribblerInstance->drawToConsole();
+
+  // 8 ms delay
+  Sleep(8);
 }
 
 void assertBoundaries_player() {

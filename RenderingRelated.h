@@ -55,9 +55,13 @@ void updateDistances(
     float* distances,        // distances from playerPos along vectors in Rays
     const Point& playerPos,  // player position. origin point of rays
     Vec2* Rays,              // vectors from player position
+    Scribbler::color* const
+        rayColors,  // colors of the walls that were hit by the rays
     size_t amountOfArrays,
-    Wall* activeWalls,  // visible walls(line segments)
-    size_t amountOfActiveWalls) {
+    Wall* activeWalls,                         // visible walls(line segments)
+    const Scribbler::color* const wallColors,  // constant colors of the walls
+    size_t amountOfActiveWalls                 // comment
+) {
   // create buffer for line segment struct
   RayFromPoint rayFromPointBuf{playerPos};
 
@@ -87,8 +91,11 @@ void updateDistances(
 
       // update distance if the new distance is shorter i.e. is closer to player
       if (((evaluatedDistance < distances[i]) && evaluatedDistance > 0) ||
-          distances[i] == -1.0f)
+          distances[i] == -1.0f) {
         distances[i] = evaluatedDistance;
+        // set the ray color equal the currently closest hit wall
+        rayColors[i] = wallColors[j];
+      }
     }
   }
 }
@@ -151,11 +158,14 @@ Vec2* initAndGenerateRayArray(
   return rays;
 }
 
-void draw3DRenderColumns(
+void draw3DRenderColumns_withColor(
     Scribbler* const s,  // drawing object
     const float* const
         distances,  // distances from playerPos along vectors in Rays
-    const size_t amountOfRays) {
+    const size_t amountOfRays,  // amount of rays used for drawing
+    const Scribbler::color* const
+        rayColumnColors  // color of each wall, same indeces as distances.
+) {
   // width of a screen column
   const uint32_t colWidth = (uint32_t)(SCREEN_WIDTH / amountOfRays);
 
@@ -188,24 +198,34 @@ void draw3DRenderColumns(
       offsetY = screenMidPointY -
                 uint32_t(float(SCREEN_HEIGHT) / distances[i] * 0.5f);
 
+      Scribbler::color colorBuffer = (Scribbler::color)0;
+      WCHAR charBuffer = ' ';
       // draw column based on distances
-      // kinda janky code
       if (distances[i] < 5) {
-        s->drawRectangle_colorAndChar(
-            remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
-            uint32_t(SCREEN_HEIGHT / distances[i]),
-            Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT, L'.');
+        charBuffer = L'.';
       } else if (distances[i] < 10) {
-        s->drawRectangle_colorAndChar(
-            remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
-            uint32_t(SCREEN_HEIGHT / distances[i]),
-            Scribbler::color::WHITE_BACKGROUND_BLACK_TEXT, L'+');
+        charBuffer = L'+';
       } else {
-        s->drawRectangle_colorAndChar(
-            remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
-            uint32_t(SCREEN_HEIGHT / distances[i]),
-            Scribbler::color::GRAY_BACKGROUND_BLACK_TEXT, L'#');
+        // this sets the intensity bits off in order to create
+        // darker variant of original color
+        colorBuffer = Scribbler::color::GRAY_BACKGROUND_BLACK_TEXT;
+        charBuffer = L'#';
       }
+      colorBuffer = (Scribbler::color)rayColumnColors[i];
+      s->drawRectangle_colorAndChar(
+          remainderColWidth + (i - 1) * colWidth, offsetY, remainderColWidth,
+          uint32_t(SCREEN_HEIGHT / distances[i]), colorBuffer, charBuffer);
     }
   }
+}
+void draw3DRenderColumns(
+    Scribbler* const s,  // drawing object
+    const float* const
+        distances,  // distances from playerPos along vectors in Rays
+    const size_t amountOfRays) {
+  draw3DRenderColumns_withColor(
+      s,             // drawing object
+      distances,     // distances from playerPos along vectors in Rays
+      amountOfRays,  // amount of rays used for drawing
+      nullptr);
 }
