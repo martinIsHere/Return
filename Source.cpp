@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
   size_t amountOfActiveWalls = 5;
   Wall activeWalls[ACTIVE_WALLS] = {
       Wall{Point{10, -1}, Vec2{0, 10}},
+      Wall{Point{0, 10}, Vec2{0, 10}},
       Wall{Point{-1, -1}, Vec2{SCREEN_WIDTH + 1, 0}},
       Wall{Point{-1, -1}, Vec2{0, SCREEN_HEIGHT + 1}},
       Wall{Point{SCREEN_WIDTH, -1}, Vec2{0, SCREEN_HEIGHT + 1}},
@@ -116,28 +117,37 @@ int main(int argc, char** argv) {
     s->drawRectangle_color((uint32_t)playerPos.x, (uint32_t)playerPos.y, 1, 1,
                            Scribbler::color::RED);
     std::string sampleMessage;
+    static bool chainIsOngoing = false;
     // debug key
     if (GetAsyncKeyState('K') >> 15) {
       if (K_isPressed) break;
       K_isPressed = true;
       // error_number(distances[1]);
-      static bool a = true;
       sampleMessage = "                      ";
       s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
       sampleMessage = std::to_string(s->getScreenWidth());
       s->writeText(0U, 0U, sampleMessage.size(), sampleMessage);
-      if (a) {
+
+      if (!chainIsOngoing) {
         wallBuffer.point = playerPos;
-        a = false;
+        chainIsOngoing = true;
       } else {
+        if (wallBuffer.vec.x != -1)
+          wallBuffer.point = wallBuffer.point + wallBuffer.vec;
+
         wallBuffer.vec = playerPos - wallBuffer.point;
-        a = true;
         activeWalls[amountOfActiveWalls] = wallBuffer;
         amountOfActiveWalls++;
-        error_number(amountOfActiveWalls);
       }
+
+      error_number(amountOfActiveWalls);
+
     } else {
       K_isPressed = false;
+    }
+    if (GetAsyncKeyState('J') >> 15) {
+      chainIsOngoing = false;
+      wallBuffer = {Point{-1, -1}, Vec2{-1, -1}};
     }
 
     sampleMessage =

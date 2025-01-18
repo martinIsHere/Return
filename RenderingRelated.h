@@ -39,7 +39,7 @@ float evaluateDistanceBetweenRayAndWall(const LineSegment& v,  // Casted Ray
   if (r < 0 || r > 1) {
     return -1;
   }
-  if (t <= 0) {
+  if (t < 0) {
     return -1;
   }
 
