@@ -1,11 +1,19 @@
 #pragma once
+#include <stdint.h>
+
 #include <string>
-#define  _WIN32_WINNT 0x0500
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
 
 // error logging functions
-#define error(message) MessageBoxA(NULL, message, "Error", NULL);
-#define error_number(message) MessageBoxA(NULL, std::to_string(message).c_str(), "Error", NULL);
-#define error_coords(num1, num2)  MessageBoxA(NULL, (std::to_string(num1) + ", " + std::to_string(num2)).c_str(), "Error", NULL);
+#define error(message) MessageBoxA(NULL, message, "Error", 0);
+#define error_number(message) \
+  MessageBoxA(NULL, std::to_string(message).c_str(), "Error", 0);
+#define error_coords(num1, num2)                                            \
+  MessageBoxA(NULL,                                                         \
+              (std::to_string(num1) + ", " + std::to_string(num2)).c_str(), \
+              "Error", 0);
 
 // important constants
 #define SCREEN_WIDTH 155
